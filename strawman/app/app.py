@@ -13,11 +13,15 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI', 'postgresql://dev_user:dev_password@localhost:5432/authservice_dev')
 
 
-def create_app():
+def create_app(database_url=None):
     """Create the Flask application and configure it."""
 
     app = Flask(__name__)
     app.config.from_object(Config())
+    if database_url is not None:
+        app.config.update(
+            SQLALCHEMY_DATABASE_URI=database_url
+        )
     db.init_app(app)
     migrate = Migrate(app, db)
     app.register_blueprint(user_bp)
