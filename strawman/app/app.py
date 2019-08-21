@@ -10,7 +10,7 @@ from strawman.api import user_bp
 class Config(object):
     """Application configuration object."""
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI', 'localhost:4200')
+    SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI', 'postgresql://dev_user:dev_password@localhost:5432/authservice_dev')
 
 
 def create_app():

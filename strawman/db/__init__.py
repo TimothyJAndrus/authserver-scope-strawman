@@ -1,1 +1,1 @@
-from strawman.db.models import db
+from strawman.db.models import db, User, Role, Client
