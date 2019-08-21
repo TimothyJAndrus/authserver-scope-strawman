@@ -310,7 +310,7 @@ Assume that a scope needs to be created to grant read only access to `https://sa
                 {
                     "description": "description of policy",
                     "policy": "${age} < 18",
-                    "mode": "redact"
+                    "mode": "restrict"
                 }
                ]
            }
