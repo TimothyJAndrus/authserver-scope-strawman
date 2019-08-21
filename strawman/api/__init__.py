@@ -1,1 +1,1 @@
-from strawman.api.api import create_app
+from strawman.api.api import user_bp

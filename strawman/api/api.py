@@ -1,15 +1,29 @@
-"""Simple Flask API"""
+"""Strawman API"""
 
-from flask import Flask
-from flask_migrate import Migrate
+from flask import Blueprint
+from flask_restful import Api, Resource
 from strawman.db import db
 
 
-def create_app():
-    """Create the Flask application and configure it."""
+class UserResource(Resource):
+    """A simple user resource."""
 
-    app = Flask(__name__)
-    db.init_app(app)
-    migrate = Migrate(app, db)
+    def get(self, id: str = None):
+        pass
 
-    return app
+    def post(self, id=None):
+        pass
+
+    def put(self, id: str = None):
+        pass
+
+    def patch(self, id: str = None):
+        pass
+
+    def delete(self, id: str = None):
+        pass
+
+
+user_bp = Blueprint('user_ep', __name__)
+user_api = Api(user_bp)
+user_api.add_resource(UserResource, '/users', '/users/<string:id>')

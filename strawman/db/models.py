@@ -30,3 +30,6 @@ class User(db.Model):
 
     def __str__(self):
         return '{} {}'.format(self.firstname, self.lastname)
+
+
+
