@@ -75,3 +75,12 @@ class Client(db.Model):
     client_secret = db.Column(db.String)
     roles = db.relationship('Role', secondary=roles, lazy='subquery',
                             backref=db.backref('clients', lazy=True))
+    tokens = db.relationship('Token')
+
+
+class Token(db.Model):
+    """A mock token."""
+
+    __tablename__ = 'tokens'
+    token = db.Column(db.String, primary_key=True)
+    client_id = db.Column(db.String, db.ForeignKey('clients.id'))
