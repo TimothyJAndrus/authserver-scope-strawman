@@ -1,9 +1,12 @@
 """Strawman API"""
 
+import json
 from flask import Blueprint
 from flask_restful import Api, Resource
-from strawman.db import db
-from strawman.middleware import protected_resource, can_access
+from sqlalchemy import text
+from strawman.db import db, User
+from strawman.middleware import protected_resource, can_access,\
+    process_request, process_response
 from strawman.utilities import ResponseBody
 
 
@@ -16,13 +19,8 @@ class UserResource(Resource):
     def get(self, id: str = None):
         is_valid_request, scope = can_access()
         if is_valid_request:
-            if hasattr(scope, 'restricted_fields'):
-                print('Restricted Fields')
-            if hasattr(scope, 'redacted_fields'):
-                print('Redacted Fields')
-            if hasattr(scope, 'access_policies'):
-                print('Access Policies')
-            return self.response_body.get_one_response(result=dict())
+
+            return self.response_body.get_one_response(result=all_users)
         else:
             return self.response_body.custom_response(
                 status='Unauthorized', code=401,

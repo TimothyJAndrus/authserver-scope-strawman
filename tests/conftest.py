@@ -65,7 +65,7 @@ REDACTION_SCOPE = {
                 "redacted_fields": [
                     {
                         "field": "ssn",
-                        "policy": "*"
+                        "filter": "*"
                     },
                 ]
             }
@@ -98,7 +98,7 @@ REDACTION_ACCESS_POLICY_SCOPE = {
                 "access_policies": [
                     {
                         "description": "description of policy",
-                        "policy": "${age} < 18",
+                        "filter": "age < 18",
                         "mode": "redact"
                     }
                 ]
@@ -132,7 +132,7 @@ RESTRICTION_ACCESS_POLICY_SCOPE = {
                 "access_policies": [
                     {
                         "description": "description of policy",
-                        "policy": "${age} < 18",
+                        "filter": "age < 18",
                         "mode": "restrict"
                     }
                 ]
@@ -162,6 +162,11 @@ def client():
     app = create_app()
     client = app.test_client()
     return client
+
+
+@pytest.fixture(scope='session')
+def scopes():
+    return ALL_SCOPES
 
 
 @pytest.fixture(scope='session', autouse=True)

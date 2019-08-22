@@ -83,17 +83,17 @@ The following JSON document describes the proposed configuration model for the s
                "redacted_fields": [
                 {
                     "field": "field5",
-                    "policy": "*"
+                    "filter": "*"
                 },
                 {
                     "field": "field6",
-                    "policy": "${field6} != null"
+                    "filter": "field6 != null"
                 },
                ],
                "access_policies": [
                 {
                     "description": "description of policy",
-                    "policy": "${age} >= 18 && ${age} < 46",
+                    "filter": "age >= 18 and age < 46",
                     "mode": "restrict"
                 }
                ]
@@ -138,14 +138,14 @@ Rules are made up of the following attributes:
 **redacted_fields** *(list)*: The name of fields that should be redacted from responses. For each field, a policy for when the redaction should be applied may be specified. For example, one may choose to redact the names and social security numbers of individuals who are younger than 18 years old. For each redacted field, the following attributes must be specified:
 
 - **field** *(string)*: The name of the field to redact.
-- **policy** *(string)*: The redaction policy that should be applied to the field.
+- **filter** *(string)*: The redaction filter that should be applied to the field.
 
 #### Access Policies
 
-**access_policies** *(list)*: A collection of policies that govern access to the data by clients. For each policy, the following fields must be specified: 
+**access_policies** *(list)*: A collection of policies that govern access to the data by clients. For each policy, the following fields must be specified:
 
 - **description** *(string)*: A human-readable description of the policy.
-- **policy** *(string)*: The rules that govern when the policy should be applied.
+- **filter** *(string)*: The rules that govern when the policy should be applied.
 - **mode** *(string)*: How the policy should be applied to the field (`redact` or `restrict`).
 
 ### Technical Considerations
@@ -230,7 +230,7 @@ Assume that a scope needs to be created to grant read only access to `https://sa
                "redacted_fields": [
                 {
                     "field": "ssn",
-                    "policy": "*"
+                    "filter": "*"
                 },
                ]
            }
@@ -269,7 +269,7 @@ Assume that a scope needs to be created to grant read only access to `https://sa
                "access_policies": [
                 {
                     "description": "description of policy",
-                    "policy": "${age} < 18",
+                    "filter": "age < 18",
                     "mode": "redact"
                 }
                ]
@@ -309,7 +309,7 @@ Assume that a scope needs to be created to grant read only access to `https://sa
                "access_policies": [
                 {
                     "description": "description of policy",
-                    "policy": "${age} < 18",
+                    "filter": "age < 18",
                     "mode": "restrict"
                 }
                ]
