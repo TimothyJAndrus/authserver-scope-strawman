@@ -93,8 +93,7 @@ The following JSON document describes the proposed configuration model for the s
                "access_policies": [
                 {
                     "description": "description of policy",
-                    "filter": "age >= 18 and age < 46",
-                    "mode": "restrict"
+                    "filter": "age >= 18 and age < 46"
                 }
                ]
            }
@@ -146,7 +145,6 @@ Rules are made up of the following attributes:
 
 - **description** *(string)*: A human-readable description of the policy.
 - **filter** *(string)*: The rules that govern when the policy should be applied.
-- **mode** *(string)*: How the policy should be applied to the field (`redact` or `restrict`).
 
 ### Technical Considerations
 
@@ -269,8 +267,7 @@ Assume that a scope needs to be created to grant read only access to `https://sa
                "access_policies": [
                 {
                     "description": "description of policy",
-                    "filter": "age < 18",
-                    "mode": "redact"
+                    "filter": "age < 18"
                 }
                ]
            }
@@ -309,8 +306,7 @@ Assume that a scope needs to be created to grant read only access to `https://sa
                "access_policies": [
                 {
                     "description": "description of policy",
-                    "filter": "age < 18",
-                    "mode": "restrict"
+                    "filter": "age < 18"
                 }
                ]
            }

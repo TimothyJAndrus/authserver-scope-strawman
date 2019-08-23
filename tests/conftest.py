@@ -30,13 +30,13 @@ READ_ONLY_SCOPE = {
     "ruleset": [
         {
             "rule": {
-                "resource": "https://sandbox.brighthive.net/programs",
+                "resource": "http://localhost:8000/users",
                 "allowed_methods": [
                     "GET"
                 ],
                 "restricted_fields": [
                     {
-                        "field": "program_address",
+                        "field": "ssn",
                         "request": True,
                         "response": True
                     }
@@ -51,13 +51,13 @@ REDACTION_SCOPE = {
     "ruleset": [
         {
             "rule": {
-                "resource": "https://sandbox.brighthive.net/participants",
+                "resource": "http://localhost:8000/users",
                 "allowed_methods": [
                     "GET",
                 ],
                 "restricted_fields": [
                     {
-                        "field": "participation_address",
+                        "field": "ssn",
                         "request": True,
                         "response": True
                     }
@@ -65,7 +65,7 @@ REDACTION_SCOPE = {
                 "redacted_fields": [
                     {
                         "field": "ssn",
-                        "filter": "*"
+                        "filter": "age < 18"
                     },
                 ]
             }
@@ -78,29 +78,29 @@ REDACTION_ACCESS_POLICY_SCOPE = {
     "ruleset": [
         {
             "rule": {
-                "resource": "https://sandbox.brighthive.net/participants",
+                "resource": "http://localhost:8000/users",
                 "allowed_methods": []
             }
         },
         {
             "rule": {
-                "resource": "https://sandbox.brighthive.net/participants/[\\w]+",
+                "resource": "http://localhost:8000/users/[\\w]+",
                 "allowed_methods": [
                     "GET"
                 ],
                 "restricted_fields": [
                     {
-                        "field": "participant_address",
+                        "field": "ssn",
                         "request": True,
                         "response": True
                     }
                 ],
-                "access_policies": [
+                "redacted_fields": [
                     {
-                        "description": "description of policy",
-                        "filter": "age < 18",
-                        "mode": "redact"
-                    }
+                        "field": "firstname",
+                        "filter": "age < 18"
+                    },
+
                 ]
             }
         }
@@ -112,28 +112,88 @@ RESTRICTION_ACCESS_POLICY_SCOPE = {
     "ruleset": [
         {
             "rule": {
-                "resource": "https://sandbox.brighthive.net/participants",
+                "resource": "http://localhost:8000/users",
                 "allowed_methods": []
             }
         },
         {
             "rule": {
-                "resource": "https://sandbox.brighthive.net/participants/[\\w]+",
+                "resource": "http://localhost:8000/users/[\\w]+",
                 "allowed_methods": [
                     "GET"
                 ],
                 "restricted_fields": [
                     {
-                        "field": "participant_address",
+                        "field": "id",
                         "request": True,
                         "response": True
                     }
                 ],
+                "redacted_fields": [
+                    {
+                        "field": "ssn",
+                        "filter": "age < 18"
+                    },
+
+                ],
                 "access_policies": [
                     {
                         "description": "description of policy",
-                        "filter": "age < 18",
-                        "mode": "restrict"
+                        "filter": "age < 18"
+                    }
+                ]
+            }
+        }
+    ]
+}
+
+COMPLEX_RULESET_SCOPE = {
+    "scope": "all:restrict-redact-filter",
+    "ruleset": [
+        {
+            "rule": {
+                "resource": "http://localhost:8000/users/[\\w]+",
+                "allowed_methods": [
+                    '*'
+                ],
+                "restricted_fields": [
+                    {
+                        "field": "id",
+                        "request": True,
+                        "response": True
+                    }
+                ],
+                "redacted_fields": [
+                    {
+                        "field": "ssn",
+                        "filter": "*"
+                    },
+                    {
+                        "field": "firstname",
+                        "filter": "age < 21"
+                    },
+                    {
+                        "field": "middlename",
+                        "filter": "age < 21"
+                    },
+                    {
+                        "field": "lastname",
+                        "filter": "age < 21"
+                    },
+                    {
+                        "field": "suffix",
+                        "filter": "age < 21"
+                    },
+                    {
+                        "field": "date_registered",
+                        "filter": "age == 45"
+                    }
+
+                ],
+                "access_policies": [
+                    {
+                        "description": "description of policy",
+                        "filter": "age < 18"
                     }
                 ]
             }
@@ -142,11 +202,30 @@ RESTRICTION_ACCESS_POLICY_SCOPE = {
 }
 
 ALL_SCOPES = [
-    FULL_ACCESS_SCOPE,
-    READ_ONLY_SCOPE,
-    REDACTION_SCOPE,
-    REDACTION_ACCESS_POLICY_SCOPE,
-    RESTRICTION_ACCESS_POLICY_SCOPE
+    {
+        'name': 'full-access-scope',
+        'scope': FULL_ACCESS_SCOPE
+    },
+    {
+        'name': 'read-only-scope',
+        'scope': READ_ONLY_SCOPE
+    },
+    {
+        'name': 'redaction-scope',
+        'scope': REDACTION_SCOPE
+    },
+    {
+        'name': 'redaction-access-policy-scope',
+        'scope': REDACTION_ACCESS_POLICY_SCOPE
+    },
+    {
+        'name': 'restriction-access-policy-scope',
+        'scope': RESTRICTION_ACCESS_POLICY_SCOPE
+    },
+    {
+        'name': 'complex-ruleset-scope',
+        'scope': COMPLEX_RULESET_SCOPE
+    }
 ]
 
 
@@ -207,7 +286,7 @@ def app():
 
         # Pre-populate scopes
         for scope in ALL_SCOPES:
-            role = Role(role=scope['scope'], description='a test role', rules=json.dumps(scope))
+            role = Role(role=scope['scope']['scope'], description='a test role', rules=json.dumps(scope['scope']))
             db.session.add(role)
             db.session.commit()
     yield app

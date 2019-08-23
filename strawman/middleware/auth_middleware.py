@@ -19,49 +19,45 @@ def process_response(ruleset, model, id=None):
     restricted_fields = []
     redacted_fields = []
     filters = []
-    filter = ''
+    filter = 'not '
 
-    # print(ruleset)
     if 'restricted_fields' in ruleset.keys():
         for restricted_field in ruleset['restricted_fields']:
             if restricted_field['response']:
                 restricted_fields.append(restricted_field['field'])
-        print(restricted_fields)
 
     if 'redacted_fields' in ruleset.keys():
         for redacted_field in ruleset['redacted_fields']:
             redacted_fields.append(redacted_field['field'])
-        print(redacted_fields)
 
     if 'access_policies' in ruleset.keys():
-        print('Filters')
         filters = ruleset['access_policies']
         for idx, filter_part in enumerate(filters):
             filter += filter_part['filter']
             if idx < len(filters) - 1:
-                filter += ' and '
-        print(filter)
+                filter += ' and not '
 
-    # all_users = []
-    # restricted_fields = ['ssn', 'id']
-    # redacted_fields = ['firstname', 'ssn', 'id']
-    # filter = text("age > 17 and age <= 21 and lastname not like '%Doe%'")
-    # users = User.query.filter(filter).all()
-    # for user in users:
-    #     user_map = {}
-    #     for field in user.__dict__.keys():
-    #         if field != '_sa_instance_state':
-    #             if field in redacted_fields and field not in restricted_fields:
-    #                 user_map[field] = '**********'
-    #             elif field not in restricted_fields:
-    #                 user_map[field] = getattr(user, field)
-    #     all_users.append(user_map)
-    # if hasattr(scope, 'restricted_fields'):
-    #     print('Restricted Fields')
-    # if hasattr(scope, 'redacted_fields'):
-    #     print('Redacted Fields')
-    # if hasattr(scope, 'access_policies'):
-    #     print('Access Policies')
+    results = model.query.filter(text(filter)).all()
+    for result in results:
+        result_map = {}
+
+        # This is horrible, define variables dynamically first so we can eval
+        for field in result.__dict__.keys():
+            locals()[field] = getattr(result, field)
+
+        for field in result.__dict__.keys():
+            if field != '_sa_instance_state':
+                if field in redacted_fields and field not in restricted_field:
+                    index = redacted_fields.index(field)
+                    filter = ruleset['redacted_fields'][index]['filter']
+                    if filter == '*' or (eval(filter)):
+                        result_map[field] = '**********'
+                    else:
+                        result_map[field] = getattr(result, field)
+                elif field not in restricted_fields:
+                    result_map[field] = getattr(result, field)
+        responses.append(result_map)
+    return responses
 
 
 def verify_client_token_and_scopes(token: str):
